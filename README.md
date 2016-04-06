@@ -19,4 +19,4 @@ Switch Sublime Text themes on the fly
 
 Package Control: [soon](https://github.com/wbond/package_control_channel/pull/5383)
 
-Inspired by the unmaintained [counterpart](https://github.com/geekpradd/Theme-Switcher)
+Inspired by [@geekpradd](https://github.com/geekpradd)'s unmaintained [counterpart](https://github.com/geekpradd/Theme-Switcher)
