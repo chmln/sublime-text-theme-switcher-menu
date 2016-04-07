@@ -28,4 +28,6 @@ Install the `Themes Menu Switcher` from [Package Control](https://packagecontrol
 ## Use
 Themes can be activated from `Preferences -> Theme` menu
 
+## Credits
+
 Credits to [@geekpradd](https://github.com/geekpradd) for idea, structure, and preamble.
