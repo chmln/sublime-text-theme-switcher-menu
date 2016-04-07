@@ -39,7 +39,7 @@ def create_menu():
     d={}
 
     for theme_path in sublime.find_resources("*.sublime-theme"):
-        dirname,group,theme_name=theme_path.split("/")
+        group,theme_name=theme_path.split("/")[-2:]
         d.setdefault(group,[]).append(theme_name)
 
     for theme_group in sorted(d.keys()):
