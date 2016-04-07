@@ -67,6 +67,7 @@ def plugin_loaded():
 
 def plugin_unloaded(): 
     os.remove(THEMES_MENU)
+    os.rmdir(PKG_FOLDER)
     
 class switchthemeCommand(sublime_plugin.WindowCommand):
     def run(self,name):
