@@ -60,7 +60,7 @@ def create_menu():
 
 
 def parsePkgName(pkg_name):
-    return pkg_name.replace("." + pkg_name.split('.')[-1],"")
+        return pkg_name.replace(".sublime-theme","").replace("-", " ")
    
 def plugin_loaded(): 
     init()
