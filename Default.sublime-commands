@@ -1,0 +1,10 @@
+[
+    {
+        "caption": "Theme-Switcher: Change Color Scheme",
+        "command": "switch_color_scheme"
+    },
+    {
+        "caption": "Theme-Switcher: Change Theme",
+        "command": "switch_theme"
+    }
+]
