@@ -1,7 +1,6 @@
 import sublime
 import sublime_plugin
 import os
-import json
 
 
 def create_menu():
@@ -49,7 +48,7 @@ def plugin_loaded():
     if not os.path.isdir(PKG_FOLDER):
         os.makedirs(PKG_FOLDER)
 
-    menu=json.loads("""
+    menu=sublime.decode_value("""
                     [{
                         "id": "preferences",
                         "children":
@@ -61,7 +60,7 @@ def plugin_loaded():
                     """)
     menu[0]['children'][0]['children']=create_menu()
     with open(THEMES_MENU, "w") as f:
-        f.write(json.dumps(menu, indent=4))
+        f.write(sublime.encode_value(menu, True))
 
 
 def plugin_unloaded():
@@ -95,8 +94,6 @@ class SwitchCommandBase(sublime_plugin.WindowCommand):
         with the help of the quick panel.
     """
 
-    _items = [ [], [] ]
-
     def run(self, name=None):
         """
             This command has two functions.
@@ -107,27 +104,19 @@ class SwitchCommandBase(sublime_plugin.WindowCommand):
         if name:
             self.apply(name)
         else:
-            self._items = [ [], [] ]
-            self.get_items()
-            self.window.show_quick_panel(self._items[0], self.on_select)
-
-    def on_select(self, index):
-        if -1 < index < len(self._items[1]):
-            self.apply(self._items[1][index])
+            [names, values] = self.get_items()
+            self.window.show_quick_panel(
+                items=names,
+                on_select=lambda x: self.apply(values[x]),
+                flags=sublime.KEEP_OPEN_ON_FOCUS_LOST)
 
     def apply(self, name):
-        sublime.load_settings("Preferences.sublime-settings").set(self.get_key(), name)
+        sublime.load_settings("Preferences.sublime-settings").set(self.KEY, name)
         sublime.save_settings("Preferences.sublime-settings")
 
 
 class SwitchThemeCommand(SwitchCommandBase):
-
-    def get_key(self):
-        """
-            Return the key in the Preferences.sublime-settings
-            to manipulate by this command.
-        """
-        return 'theme'
+    KEY = 'theme'
 
     def get_items(self):
         """
@@ -138,20 +127,18 @@ class SwitchThemeCommand(SwitchCommandBase):
 
             In this case the values are the basename of each *.sublime-theme.
         """
+        names = []
+        values = []
         for path in sorted(sublime.find_resources("*.sublime-theme")):
             path = os.path.basename(path)
-            self._items[0].append(parse_pkg_name(path))
-            self._items[1].append(path)
+            names.append(parse_pkg_name(path))
+            values.append(path)
+
+        return [names, values]
 
 
 class SwitchColorSchemeCommand(SwitchCommandBase):
-
-    def get_key(self):
-        """
-            Return the key in the Preferences.sublime-settings
-            to manipulate by this command.
-        """
-        return 'color_scheme'
+    KEY = 'color_scheme'
 
     def get_items(self):
         """
@@ -162,6 +149,11 @@ class SwitchColorSchemeCommand(SwitchCommandBase):
 
             In this case the values are the full path of each *.tmTheme.
         """
+        names = []
+        values = []
         for path in sorted(sublime.find_resources("*.tmTheme")):
-            self._items[0].append(parse_pkg_name(os.path.basename(path)))
-            self._items[1].append(path)
+            names.append(parse_pkg_name(os.path.basename(path)))
+            values.append(path)
+
+        return [names, values]
+
