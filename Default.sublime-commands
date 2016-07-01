@@ -6,9 +6,5 @@
     {
         "caption": "Set Theme",
         "command": "switch_theme",
-    },
-    {
-        "caption": "Set Skin",
-        "command": "switch_skin",
-    },
+    }
 ]
