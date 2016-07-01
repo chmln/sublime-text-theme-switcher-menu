@@ -1,0 +1,9 @@
+  Version 1.1.0
+  -------------
+  - REMOVED: some pythen library depencies and replaced them by sublime API calls
+  * FIXED: The Main.sublime-menu is only created once in the correct path.
+  * FIXED: Always show the as menu items the name of the sublime-package,
+           which provides a theme.
+  + ADDED: command pallet support with live preview to
+    - `Set Theme`
+    - `Set Color Scheme`

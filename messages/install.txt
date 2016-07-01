@@ -1,0 +1,1 @@
+  Theme-Switcher lets you easily change the theme of Sublime Text with the main menu entry `Preferences->Theme`.
