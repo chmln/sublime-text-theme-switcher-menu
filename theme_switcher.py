@@ -53,14 +53,12 @@ class RefreshThemeCacheCommand(sublime_plugin.ApplicationCommand):
         # build main menu structure
         menu = [{
             "id": "preferences",
-            "children": [
-                {
-                    "caption": "Theme",
-                    "id": "theme",
-                    "children" : self.create_menu("switch_theme",
-                                                  "*.sublime-theme")
-                }
-            ]
+            "children": [{
+                "caption": "Theme",
+                "id": "theme",
+                "children" : self.create_menu("switch_theme",
+                                              "*.sublime-theme")
+            }]
         }]
 
         # save main menu to file
@@ -70,7 +68,6 @@ class RefreshThemeCacheCommand(sublime_plugin.ApplicationCommand):
 
     @staticmethod
     def create_menu(command, file_pattern):
-        menu = []
         d = {}
 
         for path in sublime.find_resources(file_pattern):
@@ -79,15 +76,14 @@ class RefreshThemeCacheCommand(sublime_plugin.ApplicationCommand):
             # elems[-1] theme file name
             d.setdefault(elems[1], []).append(elems[-1])
 
-        for theme_group in sorted(d.keys()):
-            menu.append({
-                "caption": theme_group,
-                "children": [{
-                    "caption": built_res_name(theme),
-                    "command": command,
-                    "args": {"name": theme}
-                    } for theme in sorted(d[theme_group], key = lambda x:x.replace(".", " "))]
-            })
+        menu = [{
+            "caption": package_name,
+            "children": [{
+                "caption": built_res_name(theme),
+                "command": command,
+                "args": { "name": theme }
+                } for theme in sorted(themes, key = lambda x:x.replace(".", " ")) ]
+            } for package_name, themes in sorted(d.items()) ]
 
         menu.append({"caption": "-", "id": "separator"});
         menu.append({"caption": "Refresh Theme Cache", "command": "refresh_theme_cache"})
