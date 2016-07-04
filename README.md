@@ -1,5 +1,5 @@
 # Sublime Theme Switcher
-Switch Sublime Text themes on the fly
+Switch Sublime Text themes on the fly using the `main menu` or `command pallet`
 
 ![scr](https://cloud.githubusercontent.com/assets/11352152/14230693/b6e33c28-f92f-11e5-8d6c-b2e32054f804.png)
 
@@ -26,7 +26,11 @@ For ease of use, all themes and their variants are sorted alphabetically.
 Install the `Themes Menu Switcher` from [Package Control](https://packagecontrol.io/)
 
 ## Use
-Themes can be activated from `Preferences -> Theme` menu
+Themes can be activated from `Preferences -> Theme` menu.
+
+You can also open the command pallet with <kbd>Ctrl+Shift+P</kbd> and type:
+- `Set Theme`
+- `Set Color Scheme`
 
 ## Credits
 
