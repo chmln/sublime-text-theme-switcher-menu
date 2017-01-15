@@ -32,6 +32,27 @@ You can also open the command pallet with <kbd>Ctrl+Shift+P</kbd> and type:
 - `Select Theme`
 - `Select Color Scheme`
 
+## Settings
+
+Some plugins dynamically create themes or color schemes which are not meant to
+be selected by a user. To hide those you can create a settings file
+`Theme-Switcher.sublime-settings` and add the pathes to `"colors_exclude"` or
+`"themes_exclude"` filter lists.
+
+```js
+{
+	"colors_exclude":
+	[
+		"Packages/User/SublimeLinter",
+		"Packages/User/Sublimerge"
+	],
+	"themes_exclude":
+	[
+		"Packages/zz File Icons/"
+	]
+}
+```
+
 ## Credits
 
 Credits to [@geekpradd](https://github.com/geekpradd) for idea, structure, and preamble.
