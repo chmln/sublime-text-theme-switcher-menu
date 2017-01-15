@@ -4,32 +4,23 @@ import os
 
 
 def menu_cache_path():
-    """
-    Return absolute path for plugin's main menu cache dir.
-    """
+    """Return absolute path for plugin's main menu cache dir."""
     return sublime.packages_path() + "/User/Theme-Switcher.cache/"
 
 
 def built_res_name(pkg_name):
-    """
-    Built a beautiful menu or quick panel item name from a resource file name
-    """
-    return os.path.basename(pkg_name[:pkg_name.rfind(".")]).replace("-", " ").replace(".", " ")
+    """Built menu or quick panel item name from a resource file name."""
+    name, _ = os.path.splitext(os.path.basename(pkg_name))
+    return name.replace("-", " ").replace(".", " ")
 
 
 def plugin_loaded():
-    """
-    API entry point
-    Refresh cached Main.sublime-menu if plugin is loaded.
-    """
+    """Refresh cached Main.sublime-menu after plugin is loaded."""
     RefreshThemeCacheCommand().run()
 
 
 def plugin_unloaded():
-    """
-    API entry point
-    Clear cached Main.sublime-menu if the plugin is disabled or removed.
-    """
+    """Clear cached Main.sublime-menu if the plugin is unloaded."""
     try:
         from shutil import rmtree
         rmtree(menu_cache_path())
@@ -40,31 +31,24 @@ def plugin_unloaded():
 class RefreshThemeCacheCommand(sublime_plugin.ApplicationCommand):
 
     def run(self):
-        """
-        API entry point
-        rebuild main menu
-        """
-
+        """API entry point to rebuild main menu."""
         # create cache directory
         cache_path = menu_cache_path()
         if not os.path.isdir(cache_path):
             os.makedirs(cache_path)
-
         # build main menu structure
         menu = [{
             "id": "preferences",
             "children": [{
                 "caption": "Theme",
                 "id": "theme",
-                "children" : self.create_menu("switch_theme",
-                                              "*.sublime-theme")
+                "children": self.create_menu(
+                    "switch_theme", "*.sublime-theme")
             }]
         }]
-
         # save main menu to file
         with open(cache_path + "Main.sublime-menu", "w") as f:
             f.write(sublime.encode_value(menu, False))
-
 
     @staticmethod
     def create_menu(command, file_pattern):
@@ -83,45 +67,34 @@ class RefreshThemeCacheCommand(sublime_plugin.ApplicationCommand):
             "children": [{
                 "caption": built_res_name(theme),
                 "command": command,
-                "args": { "name": theme }
-                } for theme in sorted(themes, key = lambda x:x.replace(".", " ")) ]
-            } for package_name, themes in sorted(d.items()) ]
+                "args": {"name": theme}
+            } for theme in sorted(
+                themes, key=lambda x: x.replace(".", " "))]
+        } for package_name, themes in sorted(d.items())]
 
-        menu.append({"caption": "-", "id": "separator"});
-        menu.append({"caption": "Refresh Theme Cache", "command": "refresh_theme_cache"})
-
+        menu.append({"caption": "-", "id": "separator"})
+        menu.append({"caption": "Refresh Theme Cache",
+                    "command": "refresh_theme_cache"})
         return menu
 
 
 class SwitchWindowCommandBase(sublime_plugin.WindowCommand):
-    """
-    This is a base class for a window command to apply changes to
-    the Preferences.sublime-settings.
-
-    It is used to switch between all available themes and color schemes
-    with the help of the quick panel.
-    """
+    """Base class for SwitchThemeCommand and SwitchColorSchemeCommand."""
 
     def __init__(self, window):
         self.window = window
         self.settings = sublime.load_settings("Preferences.sublime-settings")
 
-    def run(self, name = None):
-        """
-        API entry point for command execution for both
-        SwitchThemeCommand and SwitchColorSchemeCommand
-        """
-
+    def run(self, name=None):
+        """API entry point for command execution."""
         if name:
             # A theme or color scheme file name is provided,
             # so persistently apply it, if valid.
             if any(sublime.find_resources(os.path.basename(name))):
                 self.settings.set(self.KEY, name)
                 sublime.save_settings("Preferences.sublime-settings")
-
             else:
                 sublime.status_message(name + " does not exist!")
-
         else:
             # No theme or color scheme file name is provided,
             # so let the user choose from the list of existing ones.
@@ -130,16 +103,13 @@ class SwitchWindowCommandBase(sublime_plugin.WindowCommand):
             selected_index = self.get_selected(values, current_value)
 
             self.window.show_quick_panel(
-                items = names,
-                selected_index = selected_index,
-                on_highlight = lambda x: self.settings.set(self.KEY, values[x]),
-                on_select = lambda x: self.on_select(values[x], x < 0, current_value))
+                items=names,
+                selected_index=selected_index,
+                on_highlight=lambda x: self.settings.set(self.KEY, values[x]),
+                on_select=lambda x: self.on_select(values[x], x < 0, current_value))
 
     def on_select(self, value, abort, abort_value):
-        if abort:
-            value = abort_value
-
-        self.settings.set(self.KEY, value)
+        self.settings.set(self.KEY, abort_value if abort else value)
         sublime.save_settings("Preferences.sublime-settings")
 
 
