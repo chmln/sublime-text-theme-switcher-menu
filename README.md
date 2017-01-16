@@ -29,8 +29,8 @@ Install the `Themes Menu Switcher` from [Package Control](https://packagecontrol
 Themes can be activated from `Preferences -> Theme` menu.
 
 You can also open the command pallet with <kbd>Ctrl+Shift+P</kbd> and type:
-- `Set Theme`
-- `Set Color Scheme`
+- `Select Theme`
+- `Select Color Scheme`
 
 ## Credits
 
