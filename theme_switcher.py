@@ -81,36 +81,43 @@ class RefreshThemeCacheCommand(sublime_plugin.ApplicationCommand):
 class SwitchWindowCommandBase(sublime_plugin.WindowCommand):
     """Base class for SwitchThemeCommand and SwitchColorSchemeCommand."""
 
-    def __init__(self, window):
-        self.window = window
-        self.settings = sublime.load_settings("Preferences.sublime-settings")
-
     def run(self, name=None):
         """API entry point for command execution."""
         if name:
-            # A theme or color scheme file name is provided,
-            # so persistently apply it, if valid.
-            if any(sublime.find_resources(os.path.basename(name))):
-                self.settings.set(self.KEY, name)
-                sublime.save_settings("Preferences.sublime-settings")
-            else:
-                sublime.status_message(name + " does not exist!")
+            self.apply_setting(name)
         else:
-            # No theme or color scheme file name is provided,
-            # so let the user choose from the list of existing ones.
-            names, values = self.get_items()
-            current_value = self.settings.get(self.KEY)
-            selected_index = self.get_selected(values, current_value)
+            self.show_quick_panel()
 
-            self.window.show_quick_panel(
-                items=names,
-                selected_index=selected_index,
-                on_highlight=lambda x: self.settings.set(self.KEY, values[x]),
-                on_select=lambda x: self.on_select(values[x], x < 0, current_value))
+    def apply_setting(self, name):
+        """Directly apply the provided theme or color scheme."""
+        if any(sublime.find_resources(os.path.basename(name))):
+            settings_file = "Preferences.sublime-settings"
+            sublime.load_settings(settings_file).set(self.KEY, name)
+            sublime.save_settings(settings_file)
+        else:
+            sublime.status_message(name + " does not exist!")
 
-    def on_select(self, value, abort, abort_value):
-        self.settings.set(self.KEY, abort_value if abort else value)
-        sublime.save_settings("Preferences.sublime-settings")
+    def show_quick_panel(self):
+        """List all available themes or color schemes in a quick panel."""
+        settings_file = "Preferences.sublime-settings"
+        settings = sublime.load_settings(settings_file)
+        names, values = self.get_items()
+        current_value = settings.get(self.KEY)
+        selected_index = self.get_selected(values, current_value)
+
+        def on_select(index):
+            if -1 < index < len(values):
+                settings.set(self.KEY, values[index])
+                sublime.save_settings(settings_file)
+            elif current_value:
+                settings.set(self.KEY, current_value)
+
+        def on_highlight(index):
+            settings.set(self.KEY, values[index])
+
+        self.window.show_quick_panel(
+            items=names, selected_index=selected_index,
+            on_highlight=on_highlight, on_select=on_select)
 
 
 class SwitchThemeCommand(SwitchWindowCommandBase):
