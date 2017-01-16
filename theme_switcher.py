@@ -47,8 +47,9 @@ class RefreshThemeCacheCommand(sublime_plugin.ApplicationCommand):
             }]
         }]
         # save main menu to file
-        with open(cache_path + "Main.sublime-menu", "w") as f:
-            f.write(sublime.encode_value(menu, False))
+        cache_path += "Main.sublime-menu"
+        with open(cache_path, "w", encoding="utf-8") as menu_file:
+            menu_file.write(sublime.encode_value(menu, False))
 
     @staticmethod
     def create_menu(command, file_pattern):
@@ -68,8 +69,7 @@ class RefreshThemeCacheCommand(sublime_plugin.ApplicationCommand):
                 "caption": built_res_name(theme),
                 "command": command,
                 "args": {"name": theme}
-            } for theme in sorted(
-                themes, key=lambda x: x.replace(".", " "))]
+            } for theme in themes]
         } for package_name, themes in sorted(d.items())]
 
         menu.append({"caption": "-", "id": "separator"})
