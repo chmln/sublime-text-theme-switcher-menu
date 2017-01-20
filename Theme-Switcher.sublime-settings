@@ -1,0 +1,16 @@
+{
+	// Ignore color schemes whose path include one of the listed strings.
+	// This setting is used to hide dynamically created color schemes.
+	"colors_exclude":
+	[
+		"Packages/User/SublimeLinter",
+		"Packages/User/Sublimerge"
+	],
+
+	// Ignore themes whose path include one of the listed strings.
+	// This setting is mainly used to hide dynamically created themes.
+	"themes_exclude":
+	[
+		"Packages/zz File Icons/"
+	]
+}
