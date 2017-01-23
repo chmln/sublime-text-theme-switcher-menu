@@ -108,9 +108,9 @@ class SwitchWindowCommandBase(sublime_plugin.WindowCommand):
         def on_select(index):
             if -1 < index < len(values):
                 settings.set(self.KEY, values[index])
-                sublime.save_settings(settings_file)
             elif current_value:
                 settings.set(self.KEY, current_value)
+            sublime.save_settings(settings_file)
 
         def on_highlight(index):
             settings.set(self.KEY, values[index])
