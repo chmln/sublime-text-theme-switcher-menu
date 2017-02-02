@@ -11,6 +11,7 @@
 	// This setting is mainly used to hide dynamically created themes.
 	"themes_exclude":
 	[
-		"Packages/zz File Icons/"
+		"Packages/zz File Icons/",
+		"Packages/zzz A File Icon zzz/"
 	]
 }
