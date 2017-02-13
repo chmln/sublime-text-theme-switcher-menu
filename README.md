@@ -34,7 +34,7 @@ be selected by a user. To hide those you can create a settings file
 	],
 	"themes_exclude":
 	[
-		"Packages/zz File Icons/"
+		"Packages/zzz A File Icon zzz/"
 	]
 }
 ```
