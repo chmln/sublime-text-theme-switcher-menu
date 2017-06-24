@@ -81,6 +81,8 @@ class RefreshThemeCacheCommand(sublime_plugin.ApplicationCommand):
 class SwitchWindowCommandBase(sublime_plugin.WindowCommand):
     """Base class for SwitchThemeCommand and SwitchColorSchemeCommand."""
 
+    PREFS_FILE = 'Preferences.sublime-settings'
+
     def run(self, name=None):
         """API entry point for command execution."""
         if name:
@@ -91,18 +93,16 @@ class SwitchWindowCommandBase(sublime_plugin.WindowCommand):
     def apply_setting(self, name):
         """Directly apply the provided theme or color scheme."""
         if any(sublime.find_resources(os.path.basename(name))):
-            settings_file = "Preferences.sublime-settings"
-            sublime.load_settings(settings_file).set(self.KEY, name)
-            sublime.save_settings(settings_file)
+            sublime.load_settings(self.PREFS_FILE).set(self.KEY, name)
+            sublime.save_settings(self.PREFS_FILE)
         else:
             sublime.status_message(name + " does not exist!")
 
     def show_quick_panel(self):
         """List all available themes or color schemes in a quick panel."""
-        settings_file = "Preferences.sublime-settings"
-        settings = sublime.load_settings(settings_file)
+        settings = sublime.load_settings(self.PREFS_FILE)
         names, values = self.get_items()
-        current_value = settings.get(self.KEY)
+        current_value = settings.get(self.KEY, self.DEFAULT)
         selected_index = self.get_selected(values, current_value)
 
         def on_select(index):
@@ -110,7 +110,7 @@ class SwitchWindowCommandBase(sublime_plugin.WindowCommand):
                 settings.set(self.KEY, values[index])
             elif current_value:
                 settings.set(self.KEY, current_value)
-            sublime.save_settings(settings_file)
+            sublime.save_settings(self.PREFS_FILE)
 
         def on_highlight(index):
             settings.set(self.KEY, values[index])
@@ -121,7 +121,9 @@ class SwitchWindowCommandBase(sublime_plugin.WindowCommand):
 
 
 class SwitchThemeCommand(SwitchWindowCommandBase):
+
     KEY = 'theme'
+    DEFAULT = 'Default.sublime-theme'
 
     @staticmethod
     def get_items():
@@ -135,7 +137,7 @@ class SwitchThemeCommand(SwitchWindowCommandBase):
         names = []
         values = []
         settings = sublime.load_settings("Theme-Switcher.sublime-settings")
-        exclude_list = settings.get("themes_exclude", [])
+        exclude_list = settings.get("themes_exclude") or []
         paths = sorted(
             sublime.find_resources("*.sublime-theme"),
             key=lambda x: os.path.basename(x))
@@ -161,7 +163,9 @@ class SwitchThemeCommand(SwitchWindowCommandBase):
 
 
 class SwitchColorSchemeCommand(SwitchWindowCommandBase):
+
     KEY = 'color_scheme'
+    DEFAULT = 'Packages/Color Scheme - Default/Monokai.tmTheme'
 
     @staticmethod
     def get_items():
@@ -175,7 +179,7 @@ class SwitchColorSchemeCommand(SwitchWindowCommandBase):
         names = []
         values = []
         settings = sublime.load_settings("Theme-Switcher.sublime-settings")
-        exclude_list = settings.get("colors_exclude", [])
+        exclude_list = settings.get("colors_exclude") or []
         paths = sorted(
             sublime.find_resources("*.tmTheme"),
             key=lambda x: os.path.basename(x))
