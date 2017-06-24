@@ -11,7 +11,7 @@ def menu_cache_path():
 def built_res_name(pkg_name):
     """Built menu or quick panel item name from a resource file name."""
     name, _ = os.path.splitext(os.path.basename(pkg_name))
-    return name.replace("-", " ").replace(".", " ")
+    return name.replace(" - ", " ").replace("-", " ").replace(".", " ")
 
 
 def plugin_loaded():
@@ -153,7 +153,7 @@ class SwitchThemeCommand(SwitchWindowCommandBase):
         exclude_list = settings.get("themes_exclude") or []
         paths = sorted(
             sublime.find_resources("*.sublime-theme"),
-            key=lambda x: os.path.basename(x))
+            key=lambda x: os.path.basename(x).lower())
         for path in paths:
             if not any(exclude in path for exclude in exclude_list):
                 elems = path.split("/")
@@ -195,7 +195,7 @@ class SwitchColorSchemeCommand(SwitchWindowCommandBase):
         exclude_list = settings.get("colors_exclude") or []
         paths = sorted(
             sublime.find_resources("*.tmTheme"),
-            key=lambda x: os.path.basename(x))
+            key=lambda x: os.path.basename(x).lower())
         for path in paths:
             if not any(exclude in path for exclude in exclude_list):
                 elems = path.split("/")
