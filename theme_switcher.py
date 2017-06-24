@@ -183,13 +183,17 @@ class SwitchThemeCommand(SwitchWindowCommandBase):
             key=lambda x: os.path.basename(x).lower())
         for path in paths:
             if not any(exclude in path for exclude in exclude_list):
-                elems = path.split("/")
-                # elems[1] package name
-                # elems[-1] theme file name
+                parts = path.split("/")
+                theme = parts[-1]
+                # themes are merged by ST so display only first one
+                if theme in values:
+                    continue
+                # parts[1] package name
+                # parts[-1] theme file name
                 names.append(
-                    [built_res_name(elems[-1]),    # title
-                     "Package: " + elems[1]])      # description
-                values.append(elems[-1])
+                    [built_res_name(theme),       # title
+                     "Package: " + parts[1]])     # description
+                values.append(theme)
         return [names, values]
 
     @staticmethod
