@@ -83,6 +83,10 @@ class SwitchWindowCommandBase(sublime_plugin.WindowCommand):
 
     PREFS_FILE = 'Preferences.sublime-settings'
 
+    # The last selected row index - used to debounce the search so we
+    # aren't apply a new color scheme or theme with every keypress
+    last_index = -1
+
     def run(self, name=None):
         """API entry point for command execution."""
         if name:
@@ -113,7 +117,16 @@ class SwitchWindowCommandBase(sublime_plugin.WindowCommand):
             sublime.save_settings(self.PREFS_FILE)
 
         def on_highlight(index):
-            settings.set(self.KEY, values[index])
+            if index == -1:
+                return
+
+            self.last_index = index
+
+            def update_ui():
+                if index != self.last_index:
+                    return
+                settings.set(self.KEY, values[index])
+            sublime.set_timeout(update_ui, 250)
 
         self.window.show_quick_panel(
             items=names, selected_index=selected_index,
