@@ -1,10 +1,10 @@
 [
     {
-        "caption": "Select Color Scheme",
+        "caption": "UI: Select Color Scheme",
         "command": "switch_color_scheme",
     },
     {
-        "caption": "Select Theme",
+        "caption": "UI: Select Theme",
         "command": "switch_theme",
     }
 ]

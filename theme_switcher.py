@@ -2,10 +2,22 @@ import sublime
 import sublime_plugin
 import os
 
+# Sublime Text 3127+ contains the ui.py
+_HAVE_ST_UI = int(sublime.version()) >= 3127
+
 
 def menu_cache_path():
     """Return absolute path for plugin's main menu cache dir."""
     return sublime.packages_path() + "/User/Theme-Switcher.cache/"
+
+
+def delete_cache():
+    """Delete the menu cache folder to remove main menu items."""
+    try:
+        from shutil import rmtree
+        rmtree(menu_cache_path())
+    except OSError:
+        pass
 
 
 def built_res_name(pkg_name):
@@ -16,16 +28,12 @@ def built_res_name(pkg_name):
 
 def plugin_loaded():
     """Refresh cached Main.sublime-menu after plugin is loaded."""
-    RefreshThemeCacheCommand().run()
+    sublime.run_command("refresh_theme_cache")
 
 
 def plugin_unloaded():
     """Clear cached Main.sublime-menu if the plugin is unloaded."""
-    try:
-        from shutil import rmtree
-        rmtree(menu_cache_path())
-    except:
-        pass
+    delete_cache()
 
 
 class RefreshThemeCacheCommand(sublime_plugin.ApplicationCommand):
@@ -41,21 +49,27 @@ class RefreshThemeCacheCommand(sublime_plugin.ApplicationCommand):
             "id": "preferences",
             "children": [{
                 "caption": "Theme",
-                "id": "theme",
                 "children": self.create_menu(
-                    "switch_theme", "*.sublime-theme")
+                    "switch_theme", "*.sublime-theme", "themes_exclude")
             }]
         }]
+        if _HAVE_ST_UI:
+            # ST3127+ no longer provides its own "Color Scheme" sub menu.
+            menu[0]["children"].insert(0, {
+                "caption": "Color Scheme",
+                "children": self.create_menu(
+                    "switch_theme", "*.tmTheme", "colors_exclude")
+            })
         # save main menu to file
         cache_path += "Main.sublime-menu"
         with open(cache_path, "w", encoding="utf-8") as menu_file:
             menu_file.write(sublime.encode_value(menu, False))
 
     @staticmethod
-    def create_menu(command, file_pattern):
+    def create_menu(command, file_pattern, exclude_setting):
         d = {}
         settings = sublime.load_settings("Theme-Switcher.sublime-settings")
-        exclude_list = settings.get("themes_exclude", [])
+        exclude_list = settings.get(exclude_setting, [])
         for path in sublime.find_resources(file_pattern):
             if not any(exclude in path for exclude in exclude_list):
                 elems = path.split("/")
@@ -298,3 +312,36 @@ class SwitchColorSchemeCommand(SwitchWindowCommandBase):
                 # apply view specific values
                 settings.set(self.KEY, original)
         super().reset_overridden()
+
+
+class SelectColorSchemeCommand(sublime_plugin.WindowCommand):
+    """Hide ST core select_color_scheme command.
+
+    This class is provided by the ui.py in the Default.sublime-package of
+    Sublime Text 3127+. It intends to provide the functionality of this plugin
+    by the core. Unfortunatelly it does neither provide filters nor does it
+    handle color schemes of the SublimeLinter package.
+
+    In order to provide consistent user experience, Theme Menu Switcher
+    hides this command to avoid duplicated menu or command panel entries.
+    It can still be called via run_command().
+    """
+
+    def is_visible(self):
+        return False
+
+
+class SelectThemeCommand(sublime_plugin.WindowCommand):
+    """Hide ST core select_theme command.
+
+    This class is provided by the ui.py in the Default.sublime-package of
+    Sublime Text 3127+. It intends to provide the functionality of this plugin
+    by the core. Unfortunatelly it does neither provide filters.
+
+    In order to provide consistent user experience, Theme Menu Switcher
+    hides this command to avoid duplicated menu or command panel entries.
+    It can still be called via run_command().
+    """
+
+    def is_visible(self):
+        return False
