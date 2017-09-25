@@ -8,7 +8,7 @@ _HAVE_ST_UI = int(sublime.version()) >= 3127
 
 def menu_cache_path():
     """Return absolute path for plugin's main menu cache dir."""
-    return sublime.packages_path() + "/User/Theme-Switcher.cache/"
+    return os.path.join(sublime.packages_path(), "User", "Theme-Switcher.cache")
 
 
 def delete_cache():
@@ -28,7 +28,7 @@ def built_res_name(pkg_name):
 
 def plugin_loaded():
     """Refresh cached Main.sublime-menu after plugin is loaded."""
-    sublime.run_command("refresh_theme_cache")
+    RefreshThemeCacheCommand().run()
 
 
 def plugin_unloaded():
@@ -61,7 +61,7 @@ class RefreshThemeCacheCommand(sublime_plugin.ApplicationCommand):
                     "switch_theme", "*.tmTheme", "colors_exclude")
             })
         # save main menu to file
-        cache_path += "Main.sublime-menu"
+        cache_path = os.path.join(cache_path, "Main.sublime-menu")
         with open(cache_path, "w", encoding="utf-8") as menu_file:
             menu_file.write(sublime.encode_value(menu, False))
 
