@@ -58,7 +58,7 @@ class RefreshThemeCacheCommand(sublime_plugin.ApplicationCommand):
             menu[0]["children"].insert(0, {
                 "caption": "Color Scheme",
                 "children": self.create_menu(
-                    "switch_theme", "*.tmTheme", "colors_exclude")
+                    "switch_color_scheme", "*.tmTheme", "colors_exclude")
             })
         # save main menu to file
         cache_path = os.path.join(cache_path, "Main.sublime-menu")
