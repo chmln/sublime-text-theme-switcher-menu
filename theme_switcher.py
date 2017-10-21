@@ -8,7 +8,7 @@ _HAVE_ST_UI = int(sublime.version()) >= 3127
 
 def menu_cache_path():
     """Return absolute path for plugin's main menu cache dir."""
-    return os.path.join(sublime.packages_path(), "User", "Theme-Switcher.cache")
+    return os.path.join(sublime.cache_path(), __package__)
 
 
 def delete_cache():
