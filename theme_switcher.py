@@ -8,7 +8,7 @@ _HAVE_ST_UI = int(sublime.version()) >= 3127
 
 def menu_cache_path():
     """Return absolute path for plugin's main menu cache dir."""
-    return os.path.join(sublime.packages_path(), "User", "Theme-Switcher.cache")
+    return os.path.join(sublime.cache_path(), __package__)
 
 
 def delete_cache():
@@ -50,7 +50,7 @@ class RefreshThemeCacheCommand(sublime_plugin.ApplicationCommand):
             "children": [{
                 "caption": "Theme",
                 "children": self.create_menu(
-                    "switch_theme", "*.sublime-theme", "themes_exclude")
+                    "switch_theme", ["*.sublime-theme"], "themes_exclude")
             }]
         }]
         if _HAVE_ST_UI:
@@ -58,7 +58,10 @@ class RefreshThemeCacheCommand(sublime_plugin.ApplicationCommand):
             menu[0]["children"].insert(0, {
                 "caption": "Color Scheme",
                 "children": self.create_menu(
-                    "switch_theme", "*.tmTheme", "colors_exclude")
+                    "switch_color_scheme",
+                    ["*.sublime-color-scheme", "*.tmTheme"],
+                    "colors_exclude"
+                )
             })
         # save main menu to file
         cache_path = os.path.join(cache_path, "Main.sublime-menu")
@@ -66,11 +69,14 @@ class RefreshThemeCacheCommand(sublime_plugin.ApplicationCommand):
             menu_file.write(sublime.encode_value(menu, False))
 
     @staticmethod
-    def create_menu(command, file_pattern, exclude_setting):
+    def create_menu(command, file_patterns, exclude_setting):
         d = {}
         settings = sublime.load_settings("Theme-Switcher.sublime-settings")
         exclude_list = settings.get(exclude_setting, [])
-        for path in sublime.find_resources(file_pattern):
+        resources = []
+        for pattern in file_patterns:
+            resources.extend(sublime.find_resources(pattern))
+        for path in resources:
             if not any(exclude in path for exclude in exclude_list):
                 elems = path.split("/")
                 # elems[1] package name
@@ -239,6 +245,7 @@ class SwitchColorSchemeCommand(SwitchWindowCommandBase):
         settings = sublime.load_settings("Theme-Switcher.sublime-settings")
         exclude_list = settings.get("colors_exclude") or []
         paths = sorted(
+            sublime.find_resources("*.sublime-color-scheme") +
             sublime.find_resources("*.tmTheme"),
             key=lambda x: os.path.basename(x).lower())
         for path in paths:
