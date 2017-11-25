@@ -276,7 +276,7 @@ class SwitchColorSchemeCommand(SwitchWindowCommandBase):
                 original_scheme = os.path.basename(original_scheme)
                 original_scheme = sublime.find_resources(original_scheme)[-1]
                 selected_index = values.index(original_scheme)
-            except ValueError:
+            except (IndexError, ValueError):
                 selected_index = -1
         return selected_index
 
