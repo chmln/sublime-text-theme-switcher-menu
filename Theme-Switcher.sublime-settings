@@ -4,7 +4,8 @@
 	"colors_exclude":
 	[
 		"Packages/User/SublimeLinter",
-		"Packages/User/Sublimerge"
+		"Packages/User/Sublimerge",
+		"Widget - "
 	],
 
 	// Ignore themes whose path include one of the listed strings.
